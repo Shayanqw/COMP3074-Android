@@ -1,0 +1,127 @@
+package com.example.labweek03
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFFEBD8D8)
+                ) {
+                    ChatScreen(messages = demoMessages)
+                }
+            }
+        }
+    }
+}
+
+/*=== Message part===*/
+
+data class Message(val author: String, val body: String)
+
+// A small repeating list so the screen can scroll
+private val demoMessages: List<Message> = buildList {
+    val block = listOf(
+        Message("Shayan", "Hi!"),
+        Message("Hamed", "hey Shayan How are you?"),
+        Message("Shayan", "Test..1..2...3"),
+        Message("Shayan", "i'm fine but !\n I hate coding!!!")
+    )
+    repeat(4) { addAll(block) } // repeat so it fills the screen
+}
+
+/* ---------- UI ---------- */
+
+@Composable
+fun ChatScreen(messages: List<Message>) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(WindowInsets.systemBars.asPaddingValues()) // handles top & bottom insets
+    ) {
+        items(demoMessages) { message ->
+            MessageRow(message)
+        }
+    }
+
+}
+
+@Composable
+fun MessageRow(message: Message) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Avatar()
+
+        Spacer(Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = message.author,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            // Speech bubble
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                shadowElevation = 1.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Text(
+                    text = message.body,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                )
+            }
+        }
+    }
+}
+@Composable
+private fun Avatar() {
+    Surface(
+        modifier = Modifier
+            .size(64.dp)
+            .clip(CircleShape),
+        shape = CircleShape,
+        border = BorderStroke(3.dp, Color(0xFFFF3B30)), // red ring like the screenshot
+        color = Color(0xFFF3F3F3) // light inner circle
+    ) {
+        // use a drawable resource (e.g., ScriptOrbit or Android logo)
+        Image(
+            painter = painterResource(id = R.drawable.scriptorbit512), // replace with script_orbit if that's the file name
+            contentDescription = "Avatar Logo",
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxSize()
+        )
+    }
+}
